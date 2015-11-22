@@ -1,0 +1,21 @@
+{
+  "name": "connect-proxy",
+  "version": "1.0.0",
+  "description": "Connect LG Proxy to main services needed into the web",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "wally.nm@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.3",
+    "koa": "^2.0.0-alpha.3",
+    "koa-router": "^5.2.3",
+    "lodash": "^3.10.1",
+    "node-persist": "0.0.8",
+    "q": "^1.4.1",
+    "raven": "^0.8.1",
+    "request": "^2.67.0"
+  }
+}
