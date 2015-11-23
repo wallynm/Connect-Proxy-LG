@@ -31,7 +31,7 @@ app.get('/twitter/trend', function(req, res) {
 app.all('/', function(req, res, next) {
  res.setHeader('Access-Control-Allow-Origin', 'http://localhost');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Origin,');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,X-Accept-Charset,X-Accept,Content-Type,Authorization,Accept,Origin');
   res.setHeader('Access-Control-Allow-Credentials', true);
 });
 
