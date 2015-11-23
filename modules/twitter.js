@@ -10,7 +10,7 @@ var twitterConsumerKey = 'vZPfoRahVcPOPKNtzHRjqeQwZ';
 var twitterAppKey = new Buffer(encodeURIComponent(twitterConsumerKey) + ':' + encodeURIComponent(twitterConsumerSecret)).toString('base64');
 
 storage.init({
-  dir:__dirname+'/store',
+  dir:'../store',
   stringify: JSON.stringify,
   parse: JSON.parse,
   encoding: 'utf8',
