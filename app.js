@@ -76,5 +76,4 @@ app.use(raven.middleware.express.errorHandler('https://43d873a54a3a4fdbbcc4f23a9
 app.use(onError);
 
 // App listening mode
-var port = (process.env.ENV === 'development') ? 80 : 3000;
-app.listen(port);
+app.listen(3000);
