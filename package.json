@@ -9,9 +9,8 @@
   "author": "wally.nm@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.7.1",
     "express": "^4.13.3",
-    "koa": "^2.0.0-alpha.3",
-    "koa-router": "^5.2.3",
     "lodash": "^3.10.1",
     "node-persist": "0.0.8",
     "q": "^1.4.1",

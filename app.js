@@ -1,4 +1,5 @@
 var express = require('express');
+var cors    = require('cors');
 var request = require('request');
 var storage = require('node-persist');
 var raven   = require('raven');
@@ -10,6 +11,7 @@ console.log('App started');
 // Modules
 var twitterAPI = require('./modules/twitter');
 var app = express();
+app.use(cors());
 
 storage.init({
   dir:__dirname+'/store',
@@ -26,13 +28,6 @@ app.get('/twitter/trend', function(req, res) {
   .then(function(body){
     res.json(body);
   })
-});
-
-app.all('/', function(req, res, next) {
- res.setHeader('Access-Control-Allow-Origin', 'http://localhost');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,X-Accept-Charset,X-Accept,Content-Type,Authorization,Accept,Origin');
-  res.setHeader('Access-Control-Allow-Credentials', true);
 });
 
 app.get('/twitter/search/tweets', function(req, res) {
