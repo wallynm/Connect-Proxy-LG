@@ -1,3 +1,4 @@
+var qs = require('querystring');
 var express = require('express');
 var request = require('request');
 var storage = require('node-persist');
@@ -5,16 +6,22 @@ var raven   = require('raven');
 var _       = require('lodash');
 var Q       = require('q');
 
-var twitterConsumerSecret = 'L29qez89jTSet6NzEuo0iqi6UvmvgPOnyqG5LDSj36sNR8iQDs';
-var twitterConsumerKey = 'vZPfoRahVcPOPKNtzHRjqeQwZ';
-var twitterAppKey = new Buffer(encodeURIComponent(twitterConsumerKey) + ':' + encodeURIComponent(twitterConsumerSecret)).toString('base64');
-
 storage.init({
   dir:'../store',
   stringify: JSON.stringify,
   parse: JSON.parse,
   encoding: 'utf8',
 });
+
+var config = {
+  "consumerKey": "vZPfoRahVcPOPKNtzHRjqeQwZ",
+  "consumerSecret": "L29qez89jTSet6NzEuo0iqi6UvmvgPOnyqG5LDSj36sNR8iQDs",
+}
+
+ //Get this data from your twitter apps dashboard
+exports.config;
+
+var twitterAppKey = new Buffer(encodeURIComponent(config.consumerKey) + ':' + encodeURIComponent(config.consumerSecret)).toString('base64');
 
 /**
  * Auths the app to make the basic requests and stores basic token for control in app
@@ -112,6 +119,46 @@ exports.queryTweets = function(oauthRes, placeID, query) {
   } else {
     defer.resolve(tweets);
   }
+
+  return defer.promise;
+}
+
+exports.authRequestPinUrl = function() {
+  var defer = Q.defer();
+  var oauth = { 
+    callback: 'oob', 
+    consumer_key: config.consumerKey, 
+    consumer_secret: config.consumerSecret
+  }
+
+  request.post({url:'https://api.twitter.com/oauth/request_token', oauth:oauth}, function (e, r, body) {
+    var req_data = qs.parse(body)
+    var uri = 'https://api.twitter.com/oauth/authenticate' + '?' + qs.stringify({oauth_token: req_data.oauth_token})
+    defer.resolve(uri);
+
+
+    // // request.get({url: uri}, function(e, r, body){
+    // //   defer.resolve(body);
+    // // })
+
+
+    // // step 3
+    // // after the user is redirected back to your server
+    // var auth_data = qs.parse(body)
+    //   , oauth =
+    //     { consumer_key: config.consumerKey
+    //     , consumer_secret: config.consumerSecret
+    //     , token: auth_data.oauth_token
+    //     , token_secret: req_data.oauth_token_secret
+    //     // , verifier: auth_data.oauth_verifier
+    //     }
+    //   , url = 'https://api.twitter.com/oauth/access_token'
+    //   ;
+    // request.post({url:url, oauth:oauth}, function (e, r, body) {
+    //   // console.log(body)
+    //   // defer.resolve(body);
+    // })
+  });
 
   return defer.promise;
 }

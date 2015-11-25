@@ -59,6 +59,43 @@ app.get('/twitter/search/tweets', function(req, res) {
   });
 });
 
+// app.get('/twitter/auth', function(req, res) {
+//   console.log('app route -> /twitter/search/tweets');
+//   var placeID = res.get('id') || 1;
+//   var oauthRes = undefined;
+
+//   twitterAPI.getTokenApp().then(function(auth){
+
+//     twitterAPI.getTrendingTopics(auth, placeID)
+//     .then(function(trendingTopics) {
+//       var trends = trendingTopics[0].trends;
+//       var placeID = res.get('id') || 1;
+//       var query = '';
+
+//       // Loop trends building query
+//       _.each(trends, function(k, i){
+//         query += k.query;
+//         if(trends.length -1 != i) query += ' OR ';
+//       });
+
+//       twitterAPI.queryTweets(auth, placeID, query)
+//       .then(function(body){
+//         console.log('bodyuuu', body)
+//         res.send(body);
+//       });
+//     });
+//   });
+// });
+
+
+app.get('/twitter/device', function(req, res) {
+  twitterAPI.authRequestPinUrl()
+  .then(function(authPinUrl){
+    res.writeHead(301, {Location: authPinUrl});
+    res.end();
+  });
+})
+
 
 
 
