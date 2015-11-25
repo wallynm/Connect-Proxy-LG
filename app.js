@@ -12,6 +12,7 @@ console.log('App started');
 var twitterAPI = require('./modules/twitter');
 var app = express();
 app.use(cors({origin: '*'}));
+app.use(express.static(process.cwd() + '/public'));
 
 storage.init({
   dir:__dirname+'/store',
