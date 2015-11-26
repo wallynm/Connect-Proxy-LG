@@ -81,7 +81,7 @@ exports.queryTweets = function(query, placeID, auth) {
   clearOldTweets(date);
   tweetsCollection.findOne(mongoQuery, function(err, doc) {
     if (_.isUndefined(doc) || _.isEmpty(doc)) {
-      Tweet.get('search/tweets', {count: 100, q: query}, function(err, data, response){
+      Tweet.get('search/tweets', {count: 10, q: query}, function(err, data, response){
         data.timestamp = new Date();
         data.token = auth.token;
         tweetsCollection.insert(data);
@@ -100,7 +100,7 @@ exports.geHomeTimeline = function(auth) {
   var defer = Q.defer();
   Tweet = authTweet(auth);
 
-  Tweet.get('statuses/home_timeline', {count: 200}, function(err, data, response){
+  Tweet.get('statuses/home_timeline', {count: 20}, function(err, data, response){
     defer.resolve(data);
   });
   return defer.promise;
