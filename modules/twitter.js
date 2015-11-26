@@ -34,7 +34,11 @@ var Tweet = new Twit({
   app_only_auth: true
 });
 
+// If data auth correcly passed, return auth object, otherwise runs a inapp request
 var authTweet = function(data) {
+  if(_.isEmpty(data.token) || _.isUndefined(data.token) || _.isUndefined(data.secret) || _.isUndefined(data.secret))
+    return Tweet;
+
   return new Twit({
     consumer_key: config.consumerKey, 
     consumer_secret: config.consumerSecret,
@@ -50,10 +54,7 @@ exports.getTrendingTopics = function(placeID, auth) {
 
   trendsCollection.findOne({timestamp: {$gt: date}, 'locations.0.woeid': placeID}, function(err, doc) {
     if (_.isUndefined(doc) || _.isEmpty(doc)) {
-
-      if(!_.isEmpty(auth) || !_.isUndefined(auth))
-        Tweet = authTweet(auth);
-
+      Tweet = authTweet(auth);
       Tweet.get('trends/place', {id: placeID}, function(err, data, response){
         var object = data[0];
         object.timestamp = new Date();
@@ -71,9 +72,9 @@ exports.queryTweets = function(query, placeID, auth) {
   var defer = Q.defer();
   var date = getPastMinutes(1);
   var mongoQuery = {timestamp: {$gt: date}};
+  Tweet = authTweet(auth);
 
-  if(!_.isEmpty(auth) || !_.isUndefined(auth)){
-    Tweet = authTweet(auth);
+  if(!_.isEmpty(auth.token) && !_.isUndefined(auth.token)){
     mongoQuery.token = auth.token;
   }
 
@@ -84,11 +85,11 @@ exports.queryTweets = function(query, placeID, auth) {
         data.timestamp = new Date();
         data.token = auth.token;
         tweetsCollection.insert(data);
-        defer.resolve(data);
+        defer.resolve(data.statuses);
       });
 
     } else {
-      defer.resolve(doc);
+      defer.resolve(doc.statuses);
     }
   });
 
@@ -97,10 +98,7 @@ exports.queryTweets = function(query, placeID, auth) {
 
 exports.geHomeTimeline = function(auth) {
   var defer = Q.defer();
-
-  if(!_.isEmpty(auth) || !_.isUndefined(auth)){
-    Tweet = authTweet(auth);
-  }
+  Tweet = authTweet(auth);
 
   Tweet.get('statuses/home_timeline', {count: 200}, function(err, data, response){
     defer.resolve(data);
