@@ -19,6 +19,30 @@ app.use(express.static(process.cwd() + '/public'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
+
+app.get('/geodata', function(req, res) {
+  var auth = {
+    token: req.query.token,
+    secret: req.query.secret
+  };
+
+  request.get({url: 'http://ip-api.com/json'}, function(e, r, body) {
+    var geoObject = JSON.parse(body);
+    twitterAPI.getWoeid({long: geoObject.lon, lat: geoObject.lat}, auth)
+    .then(function(data){
+      data = data[0];
+      geoObject.country = data.country;
+      geoObject.countryCode = data.countryCode;
+      geoObject.name = data.name;
+      geoObject.parentid = data.parentid;
+      geoObject.placeType = data.placeType;
+      geoObject.woeid = data.woeid;
+      res.send(geoObject);
+    });
+  });
+});
+
+
 app.get('/twitter/trend', function(req, res) {
   console.log('app route -> /twitter/trend');
   var placeid = req.query.placeid || 1;
@@ -63,8 +87,7 @@ app.get('/twitter/timeline', function(req, res) {
   .then(function(timeline) {
     res.send(timeline);
   });
-})
-
+});
 
 
 /**

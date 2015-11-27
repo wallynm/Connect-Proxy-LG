@@ -56,6 +56,11 @@ exports.getTrendingTopics = function(placeID, auth) {
     if (_.isUndefined(doc) || _.isEmpty(doc)) {
       Tweet = authTweet(auth);
       Tweet.get('trends/place', {id: placeID}, function(err, data, response){
+        if(err){
+          defer.reject(err);
+          return;
+        }
+
         var object = data[0];
         object.timestamp = new Date();
         trendsCollection.insert(object);
@@ -81,7 +86,7 @@ exports.queryTweets = function(query, placeID, auth) {
   clearOldTweets(date);
   tweetsCollection.findOne(mongoQuery, function(err, doc) {
     if (_.isUndefined(doc) || _.isEmpty(doc)) {
-      Tweet.get('search/tweets', {count: 10, q: query}, function(err, data, response){
+      Tweet.get('search/tweets', {count: 100, q: query}, function(err, data, response){
         data.timestamp = new Date();
         data.token = auth.token;
         tweetsCollection.insert(data);
@@ -100,16 +105,31 @@ exports.geHomeTimeline = function(auth) {
   var defer = Q.defer();
   Tweet = authTweet(auth);
 
-  Tweet.get('statuses/home_timeline', {count: 20}, function(err, data, response){
+  Tweet.get('statuses/home_timeline', {count: 200}, function(err, data, response){
     defer.resolve(data);
   });
   return defer.promise;
 }
 
 
-/**
- * Generates PIN Url
- */
+exports.getWoeid = function(params, auth) {
+  var defer = Q.defer();
+  
+  Tweet = authTweet(auth);
+  Tweet.get('trends/closest', params, function(err, data, response){
+    defer.resolve(data);
+  });
+  return defer.promise;
+}
+
+
+
+
+
+
+// ----  AUTH RELATED METHODS ----
+// Down this side, just auth methods, that just works
+// take care while editing it - Auth based on PIN auth
 exports.authRequestPinUrl = function() {
   var defer = Q.defer();
   clearOldKeys();
@@ -170,8 +190,8 @@ clearOldTweets = function(date) {
 }
 
 clearOldTrends = function(date) {
-  // trendsBulk.find({timestamp: {$lt: date}}).remove();
-  // trendsBulk.execute(function () {});
+  trendsBulk.find({timestamp: {$lt: date}}).remove();
+  trendsBulk.execute(function () {});
 }
 
 clearOldKeys = function() {
