@@ -57,22 +57,57 @@ app.get('/twitter/trend', function(req, res) {
   })
 });
 
-app.get('/twitter/search/tweets', function(req, res) {
-  console.log('app route -> /twitter/search/tweets');
-  var placeid = req.query.placeid || 1;
+app.get('/twitter/homepage', function(req, res) {
+  console.log('app route -> /twitter/homepage');
+  var promisses = [];  
+  var filters = req.query.filter;
   var auth = {
     token: req.query.token,
     secret: req.query.secret
   };
 
-  twitterAPI.getTrendingTopics(placeid, auth)
-  .then(function(trendingTopics) {
-    var trends = trendingTopics.trends;
-    var query = _.sample(trends, 3).join(' OR ');
-    
-    twitterAPI.queryTweets(query, placeid, auth)
-    .then(function(body){
-      res.send(body);
+  if(!_.isArray(filters))
+    filters = [filters];
+
+  // Config the promisses
+  _.each(filters, function(v, k) {
+    if(v === 'timeline'){
+      promisses.push(twitterAPI.geHomeTimeline(20, auth));
+    } else {
+      // console.warn(v);
+      promisses.push(twitterAPI.getTrendingTopics(v, auth));
+    }
+  });
+
+    console.warn(promisses);
+
+
+  Q.all(promisses).then(function(result){
+    var tweets = [];
+    var query = '';
+
+    _.each(result, function(resultP) {
+      // Trends, need to be fetch
+      if(!_.isUndefined(resultP.trends)) {
+        var trends = _.flatten(_.map(resultP.trends, 'name'));
+        query += _.sample(trends , 3).join(' OR ');
+        console.log(trends)
+        console.log(query)
+
+      } else {
+        tweets = tweets.concat(resultP);
+      }
+
+      // Checks if really there's something to query about tweets
+      if(query){
+        twitterAPI.queryTweets(query, 1, auth)
+        .then(function(body){
+          tweets = tweets.concat(body);
+          res.send(tweets);
+        });
+      } else {
+        res.send(tweets);
+      }
     });
   });
 });
@@ -83,7 +118,7 @@ app.get('/twitter/timeline', function(req, res) {
     secret: req.query.secret
   };
 
-  twitterAPI.geHomeTimeline(auth)
+  twitterAPI.geHomeTimeline(200, auth)
   .then(function(timeline) {
     res.send(timeline);
   });

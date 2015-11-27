@@ -49,15 +49,15 @@ var authTweet = function(data) {
 
 exports.getTrendingTopics = function(placeID, auth) {
   var defer = Q.defer();
-  var date = getPastMinutes(10);
+  var date = getPastMinutes(30);
   clearOldTrends(date);
 
-  trendsCollection.findOne({timestamp: {$gt: date}, 'locations.0.woeid': placeID}, function(err, doc) {
-    if (_.isUndefined(doc) || _.isEmpty(doc)) {
+  trendsCollection.findOne({timestamp: {$gt: date}, 'locations.0.woeid': parseInt(placeID)}, function(err, doc) {
+    if (_.isUndefined(doc) || _.isEmpty(doc)) {      
       Tweet = authTweet(auth);
       Tweet.get('trends/place', {id: placeID}, function(err, data, response){
         if(err){
-          defer.reject(err);
+          defer.resolve(data);
           return;
         }
 
@@ -86,7 +86,7 @@ exports.queryTweets = function(query, placeID, auth) {
   clearOldTweets(date);
   tweetsCollection.findOne(mongoQuery, function(err, doc) {
     if (_.isUndefined(doc) || _.isEmpty(doc)) {
-      Tweet.get('search/tweets', {count: 100, q: query}, function(err, data, response){
+      Tweet.get('search/tweets', {count: 20, q: query}, function(err, data, response){
         data.timestamp = new Date();
         data.token = auth.token;
         tweetsCollection.insert(data);
@@ -101,11 +101,12 @@ exports.queryTweets = function(query, placeID, auth) {
   return defer.promise;
 }
 
-exports.geHomeTimeline = function(auth) {
+exports.geHomeTimeline = function(count, auth) {
   var defer = Q.defer();
+  count = count || 200;
   Tweet = authTweet(auth);
 
-  Tweet.get('statuses/home_timeline', {count: 200}, function(err, data, response){
+  Tweet.get('statuses/home_timeline', {count: count}, function(err, data, response){
     defer.resolve(data);
   });
   return defer.promise;
