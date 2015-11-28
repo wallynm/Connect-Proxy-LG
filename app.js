@@ -6,6 +6,7 @@ var raven   = require('raven');
 var _       = require('lodash');
 var Q       = require('q');
 var shortid = require('shortid');
+var requestIp  = require('request-ip');
 var bodyParser = require('body-parser');
 var mongojs = require('mongojs');
 var db      = mongojs('connect');
@@ -21,12 +22,18 @@ app.use(bodyParser.json());
 
 
 app.get('/geodata', function(req, res) {
+  var clientIp = requestIp.getClientIp(req);
   var auth = {
     token: req.query.token,
     secret: req.query.secret
   };
 
-  request.get({url: 'http://ip-api.com/json'}, function(e, r, body) {
+  if(clientIp == '::1')
+    clientIp = '';
+
+  console.warn(clientIp)  
+
+  request.get({url: 'http://ip-api.com/json/'+clientIp}, function(e, r, body) {
     var geoObject = JSON.parse(body);
     twitterAPI.getWoeid({long: geoObject.lon, lat: geoObject.lat}, auth)
     .then(function(data){
