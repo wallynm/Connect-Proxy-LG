@@ -27,6 +27,8 @@ app.get('/geodata', function(req, res) {
   var clientIp = (req.query.ip) ? req.query.ip : requestIp.getClientIp(req);
   var securedIp = requestIp.getClientIp(req);
 
+  console.log(req)
+
   console.log(req.headers['x-forwarded-for']);
 
   if(typeof req.connection !== 'undefined')  
