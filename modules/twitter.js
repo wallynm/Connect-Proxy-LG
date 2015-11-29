@@ -78,7 +78,7 @@ exports.queryTweets = function(query, auth) {
   Tweet = authTweet(auth);
 
   Tweet.get('search/tweets', query, function(err, data, response){
-    console.log(query, data)
+    console.log(query, data.length)
     defer.resolve(data);
   });
   return defer.promise;
