@@ -48,6 +48,25 @@ app.get('/geodata', function(req, res) {
   if(clientIp == '::1')
     clientIp = '';
 
+  res.send({ 
+    as: 'AS28573 S.A.',
+    city: 'Belo Horizonte',
+    country: 'Brazil',
+    countryCode: 'BR',
+    isp: 'Virtua',
+    org: 'Virtua',
+    query: '186.206.177.214',
+    region: 'MG',
+    regionName: 'Minas Gerais',
+    status: 'success',
+    timezone: 'America/Sao_Paulo',
+    zip: '31260',
+    cityLat: '-19.9167',
+    cityLong: '-43.9333',
+    countryLat: '-10.0000',
+    countryLong: '-55.0000' 
+  });
+
   request.get({url: 'http://ip-api.com/json/'+clientIp}, function(e, r, body) {
     var geoObject = JSON.parse(body);
 
@@ -58,7 +77,7 @@ app.get('/geodata', function(req, res) {
       geoObject.countryLong = doc.long;
 
       delete geoObject.lat;
-      delete geoObject.long;
+      delete geoObject.lon;
 
       console.warn(geoObject)
 
