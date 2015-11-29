@@ -53,7 +53,7 @@ app.get('/geodata', function(req, res) {
 
     geodataCollection.findOne({countryCode: geoObject.countryCode}, function(err, doc){
       geoObject.cityLat = geoObject.lat;
-      geoObject.cityLong = geoObject.long;
+      geoObject.cityLong = geoObject.lon;
       geoObject.countryLat = doc.lat;
       geoObject.countryLong = doc.long;
 
