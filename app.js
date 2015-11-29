@@ -25,6 +25,13 @@ app.use(bodyParser.json());
 app.get('/geodata', function(req, res) {
   console.warn('geoDATA ' + req.query.ip)
   var clientIp = (req.query.ip) ? req.query.ip : requestIp.getClientIp(req);
+  var securedIp = requestIp.getClientIp(req);
+
+  console.log(req.headers['x-forwarded-for']);
+  console.log(req.connection.remoteAddress);
+  console.log(req.socket.remoteAddress);
+  console.log(req.connection.socket.remoteAddress);
+
   var auth = {
     token: req.query.token,
     secret: req.query.secret
