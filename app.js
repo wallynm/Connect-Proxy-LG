@@ -11,6 +11,7 @@ var bodyParser = require('body-parser');
 var mongojs = require('mongojs');
 var db      = mongojs('connect');
 var authCollection = db.collection('userauth');
+var geodataCollection = db.collection('system_geodata');
 
 // Modules
 var twitterAPI = require('./modules/twitter');
@@ -31,19 +32,17 @@ app.get('/geodata', function(req, res) {
   if(clientIp == '::1')
     clientIp = '';
 
-  console.warn(clientIp)  
-
   request.get({url: 'http://ip-api.com/json/'+clientIp}, function(e, r, body) {
     var geoObject = JSON.parse(body);
-    twitterAPI.getWoeid({long: geoObject.lon, lat: geoObject.lat}, auth)
-    .then(function(data){
-      data = data[0];
-      geoObject.country = data.country;
-      geoObject.countryCode = data.countryCode;
-      geoObject.name = data.name;
-      geoObject.parentid = data.parentid;
-      geoObject.placeType = data.placeType;
-      geoObject.woeid = data.woeid;
+
+    geodataCollection.findOne({countryCode: geoObject.countryCode}, function(err, doc){
+      geoObject.cityLat = geoObject.lat;
+      geoObject.cityLong = geoObject.long;
+      geoObject.countryLat = doc.lat;
+      geoObject.countryLong = doc.long;
+
+      delete geoObject.lat;
+      delete geoObject.long;
       res.send(geoObject);
     });
   });
@@ -66,71 +65,42 @@ app.get('/twitter/trend', function(req, res) {
 
 app.get('/twitter/homepage', function(req, res) {
   console.log('app route -> /twitter/homepage');
-  var promisses = [];  
-  var filters = req.query.filter;
+  var query = {};  
   var auth = {
     token: req.query.token,
     secret: req.query.secret
   };
 
-  if(!_.isArray(filters))
-    filters = [filters];
+  query.geocode = req.query.filter
+  query.count = 20;
 
-  // Config the promisses
-  _.each(filters, function(v, k) {
-    if(v === 'timeline'){
-      promisses.push(twitterAPI.geHomeTimeline(20, auth));
-    } else {
-      // console.warn(v);
-      promisses.push(twitterAPI.getTrendingTopics(v, auth));
-    }
-  });
-
-    console.warn(promisses);
-
-
-  Q.all(promisses).then(function(result){
-    var tweets = [];
-    var query = '';
-
-    _.each(result, function(resultP) {
-      // Trends, need to be fetch
-      if(!_.isUndefined(resultP.trends)) {
-        var trends = _.flatten(_.map(resultP.trends, 'name'));
-        query += _.sample(trends , 3).join(' OR ');
-        console.log(trends)
-        console.log(query)
-
-      } else {
-        tweets = tweets.concat(resultP);
-      }
-
-      // Checks if really there's something to query about tweets
-      if(query){
-        twitterAPI.queryTweets(query, 1, auth)
-        .then(function(body){
-          tweets = tweets.concat(body);
-          res.send(tweets);
-        });
-      } else {
-        res.send(tweets);
-      }
-    });
+  twitterAPI.queryTweets(query, auth)
+  .then(function(tweets) {
+    res.send(tweets);
   });
 });
 
 app.get('/twitter/timeline', function(req, res) {
+  var query = {};
   var auth = {
     token: req.query.token,
     secret: req.query.secret
   };
+  query.count = 20;
 
-  twitterAPI.geHomeTimeline(200, auth)
+  if(req.query.max_id){
+    query.max_id = req.query.max_id;
+  }
+
+  twitterAPI.geHomeTimeline(query, auth)
   .then(function(timeline) {
     res.send(timeline);
   });
 });
 
+
+// var trends = _.flatten(_.map(resultP.trends, 'name'));
+// query += _.sample(trends , 3).join(' OR ');
 
 /**
  * Generate URL Auth token and redirects user to Twitter PIN Page

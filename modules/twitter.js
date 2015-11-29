@@ -73,40 +73,24 @@ exports.getTrendingTopics = function(placeID, auth) {
   return defer.promise;
 }
 
-exports.queryTweets = function(query, placeID, auth) {
+exports.queryTweets = function(query, auth) {
   var defer = Q.defer();
-  var date = getPastMinutes(1);
-  var mongoQuery = {timestamp: {$gt: date}};
   Tweet = authTweet(auth);
 
-  if(!_.isEmpty(auth.token) && !_.isUndefined(auth.token)){
-    mongoQuery.token = auth.token;
-  }
-
-  clearOldTweets(date);
-  tweetsCollection.findOne(mongoQuery, function(err, doc) {
-    if (_.isUndefined(doc) || _.isEmpty(doc)) {
-      Tweet.get('search/tweets', {count: 20, q: query}, function(err, data, response){
-        data.timestamp = new Date();
-        data.token = auth.token;
-        tweetsCollection.insert(data);
-        defer.resolve(data.statuses);
-      });
-
-    } else {
-      defer.resolve(doc.statuses);
-    }
+  Tweet.get('search/tweets', query, function(err, data, response){
+    console.log(query, data)
+    defer.resolve(data);
   });
-
   return defer.promise;
 }
 
-exports.geHomeTimeline = function(count, auth) {
+exports.geHomeTimeline = function(query, auth) {
   var defer = Q.defer();
-  count = count || 200;
   Tweet = authTweet(auth);
 
-  Tweet.get('statuses/home_timeline', {count: count}, function(err, data, response){
+  query.count = query.count || 200;
+
+  Tweet.get('statuses/home_timeline', query, function(err, data, response){
     defer.resolve(data);
   });
   return defer.promise;
@@ -122,9 +106,6 @@ exports.getWoeid = function(params, auth) {
   });
   return defer.promise;
 }
-
-
-
 
 
 
