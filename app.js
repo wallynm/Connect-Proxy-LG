@@ -67,23 +67,23 @@ app.get('/geodata', function(req, res) {
     countryLong: '-55.0000' 
   });
 
-  request.get({url: 'http://ip-api.com/json/'+clientIp}, function(e, r, body) {
-    var geoObject = JSON.parse(body);
+  // request.get({url: 'http://ip-api.com/json/'+clientIp}, function(e, r, body) {
+  //   var geoObject = JSON.parse(body);
 
-    geodataCollection.findOne({countryCode: geoObject.countryCode}, function(err, doc){
-      geoObject.cityLat = geoObject.lat;
-      geoObject.cityLong = geoObject.lon;
-      geoObject.countryLat = doc.lat;
-      geoObject.countryLong = doc.long;
+  //   geodataCollection.findOne({countryCode: geoObject.countryCode}, function(err, doc){
+  //     geoObject.cityLat = geoObject.lat;
+  //     geoObject.cityLong = geoObject.lon;
+  //     geoObject.countryLat = doc.lat;
+  //     geoObject.countryLong = doc.long;
 
-      delete geoObject.lat;
-      delete geoObject.lon;
+  //     delete geoObject.lat;
+  //     delete geoObject.lon;
 
-      console.warn(geoObject)
+  //     console.warn(geoObject)
 
-      res.send(geoObject);
-    });
-  });
+  //     res.send(geoObject);
+  //   });
+  // });
 });
 
 
