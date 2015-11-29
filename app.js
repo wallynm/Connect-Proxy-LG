@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 
 app.get('/geodata', function(req, res) {
   console.warn('geoDATA ' + req.query.ip)
-  var clientIp = (req.params.ip) ? req.query.ip : requestIp.getClientIp(req);
+  var clientIp = (req.query.ip) ? req.query.ip : requestIp.getClientIp(req);
   var auth = {
     token: req.query.token,
     secret: req.query.secret
