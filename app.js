@@ -143,7 +143,7 @@ app.get('/twitter/timeline', function(req, res) {
 /**
  * Generate URL Auth token and redirects user to Twitter PIN Page
  */
-app.get('/twitter/:key?', function(req, res) {
+app.get('/twitter/device/:key?', function(req, res) {
   var key = req.params.key;
 
   if(_.isUndefined(key)){
