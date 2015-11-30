@@ -109,8 +109,18 @@ app.get('/twitter/homepage', function(req, res) {
     secret: req.query.secret
   };
 
-  query.geocode = req.query.filter
-  query.count = 20;
+  query.geocode = req.query.filter;
+  query.count = _.isUndefined(req.query.count) ? 20 : req.query.count
+
+  if(_.isUndefined(req.query.lang))
+    query.lang = req.query.lang;
+
+  if(_.isUndefined(req.query.result_type))
+    query.result_type = req.query.result_type;  
+
+  if(_.isUndefined(req.query.max_id))
+    query.max_id = req.query.max_id;  
+
 
   twitterAPI.queryTweets(query, auth)
   .then(function(tweets) {
