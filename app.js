@@ -193,7 +193,12 @@ app.post('/twitter/auth', function(req, res) {
   });
 });
 
+app.get('/facebook/usertestkey', function(req, res) {
+  var obj = {};
+  obj.access_token = 'CAAO3uAy3598BABFsTcSb27IURHRtJUtRfyL9oCiGYZAxPJ169TdCxVvJrEZChm2VWDFzwSbWBUPsXBKBZAZCmZArwznmfTw3Nf7zJMZBCiJUz76xtTVNnUUGd4geLEhEfUINfceWqyVm33rcdrGjCR5pnBOSP6CfviBxvZCz1OMLObK7EGeYYc5OHsjjCxZCjZBPbrzGQjsaAZC9bmYK1gmfsW';
 
+  res.send(obj);
+});
 
 
 // /**
