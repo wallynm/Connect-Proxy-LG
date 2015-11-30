@@ -119,7 +119,11 @@ app.get('/twitter/homepage', function(req, res) {
     query.result_type = req.query.result_type;  
 
   if(_.isUndefined(req.query.max_id))
-    query.max_id = req.query.max_id;  
+    query.max_id = req.query.max_id;
+
+  console.log('req.query', req.query)
+
+  console.log('tweetQuery', query)
 
 
   twitterAPI.queryTweets(query, auth)
