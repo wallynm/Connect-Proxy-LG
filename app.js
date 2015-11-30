@@ -143,7 +143,7 @@ app.get('/twitter/timeline', function(req, res) {
 /**
  * Generate URL Auth token and redirects user to Twitter PIN Page
  */
-app.get('/twitter/device/:key?', function(req, res) {
+app.get('/twitter/:key?', function(req, res) {
   var key = req.params.key;
 
   if(_.isUndefined(key)){
@@ -172,7 +172,7 @@ app.get('/twitter/url_device', function(req, res) {
 });
 
 // Gera a token no server e prepara os 
-app.post('/twitter/device/auth', function(req, res) {
+app.post('/twitter/auth', function(req, res) {
   twitterAPI.authPinUser(req.body)
   .then(function(result) {
     res.send(result);
