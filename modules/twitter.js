@@ -79,9 +79,7 @@ exports.queryTweets = function(query, auth) {
 
   Tweet.get('search/tweets', query, function(err, data, response){
     if(!_.isUndefined(data.search_metadata)){
-      var searchParams = qs.parse(data.search_metadata.next_results);
-      console.log(searchParams, data.search_metadata)
-
+      var searchParams = qs.parse(data.search_metadata.next_results.substring(1));
       data.max_id = searchParams.max_id;
     }
 
